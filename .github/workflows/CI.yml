@@ -8,15 +8,14 @@ env:
   push:
     branches:
       - main
+      - master
     tags-ignore:
       - '**'
-    paths-ignore:
-      - '**/*.md'
-      - LICENSE
-      - '**/*.gitignore'
-      - .editorconfig
-      - docs/**
-  pull_request: null
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -30,15 +29,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
+          cache: npm
+      - name: Workaround npm optional deps bug (remove lockfile on Linux)
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        run: rm -f package-lock.json || true
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
-      - name: Install dependencies
-        run: yarn install
+      - name: Configure npm (public registry, no auth)
+        run: |
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
+        env: {}
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Oxlint
-        run: yarn lint
+        run: npm run lint
       - name: Cargo fmt
         run: cargo fmt -- --check
       - name: Clippy
@@ -50,22 +68,22 @@ jobs:
         settings:
           - host: macos-latest
             target: x86_64-apple-darwin
-            build: yarn build --target x86_64-apple-darwin
+            build: npm run build -- --target x86_64-apple-darwin
           - host: windows-latest
-            build: yarn build --target x86_64-pc-windows-msvc
+            build: npm run build -- --target x86_64-pc-windows-msvc
             target: x86_64-pc-windows-msvc
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            build: yarn build --target x86_64-unknown-linux-gnu --use-napi-cross
+            build: npm run build -- --target x86_64-unknown-linux-gnu --use-napi-cross
           - host: macos-latest
             target: aarch64-apple-darwin
-            build: yarn build --target aarch64-apple-darwin
+            build: npm run build -- --target aarch64-apple-darwin
           - host: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            build: yarn build --target aarch64-unknown-linux-gnu --use-napi-cross
+            build: npm run build -- --target aarch64-unknown-linux-gnu --use-napi-cross
           - host: windows-latest
             target: aarch64-pc-windows-msvc
-            build: yarn build --target aarch64-pc-windows-msvc
+            build: npm run build -- --target aarch64-pc-windows-msvc
     name: stable - ${{ matrix.settings.target }} - node@22
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -74,12 +92,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
+          cache: npm
+      - name: Workaround npm optional deps bug (remove lockfile on Linux)
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        run: rm -f package-lock.json || true
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           targets: ${{ matrix.settings.target }}
+      - name: Install aarch64 GNU cross-compiler (Ubuntu)
+        if: ${{ matrix.settings.host == 'ubuntu-latest' && contains(matrix.settings.target, 'aarch64-unknown-linux-gnu') }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+      - name: Configure cargo linker for aarch64-unknown-linux-gnu
+        if: ${{ matrix.settings.host == 'ubuntu-latest' && contains(matrix.settings.target, 'aarch64-unknown-linux-gnu') }}
+        run: |
+          mkdir -p .cargo
+          printf "[target.aarch64-unknown-linux-gnu]\nlinker = \"aarch64-linux-gnu-gcc\"\n" > .cargo/config.toml
       - name: Cache cargo
         uses: actions/cache@v4
         with:
@@ -106,8 +137,24 @@ jobs:
         run: ${{ matrix.settings.setup }}
         if: ${{ matrix.settings.setup }}
         shell: bash
-      - name: Install dependencies
-        run: yarn install
+      - name: Configure npm (public registry, no auth)
+        run: |
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
+        env: {}
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Build
         run: ${{ matrix.settings.build }}
         shell: bash
@@ -149,10 +196,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: yarn
+          cache: npm
           architecture: ${{ matrix.settings.architecture }}
-      - name: Install dependencies
-        run: yarn install
+      - name: Configure npm (public registry, no auth)
+        run: |
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
+        env: {}
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -162,7 +225,7 @@ jobs:
         run: ls -R .
         shell: bash
       - name: Test bindings
-        run: yarn test
+        run: npm test
   test-linux-binding:
     name: Test ${{ matrix.target }} - node@${{ matrix.node }}
     needs:
@@ -183,7 +246,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: yarn
+          cache: npm
+      - name: Workaround npm optional deps bug (remove lockfile on Linux)
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        run: rm -f package-lock.json || true
       - name: Output docker params
         id: docker
         run: |
@@ -203,11 +269,20 @@ jobs:
               console.log('IMAGE=node:${{ matrix.node }}-slim')
             }
           " >> $GITHUB_OUTPUT
-      - name: Install dependencies
+      - name: Configure npm (public registry, no auth)
         run: |
-          yarn config set --json supportedArchitectures.cpu '["current", "arm64", "x64", "arm"]'
-          yarn config set --json supportedArchitectures.libc '["current", "musl", "gnu"]'
-          yarn install
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
+        env: {}
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm install --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -228,7 +303,7 @@ jobs:
         with:
           image: ${{ steps.docker.outputs.IMAGE }}
           options: '-v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} --platform ${{ steps.docker.outputs.PLATFORM }}'
-          run: yarn test
+          run: npm test
   publish:
     name: Publish
     runs-on: ubuntu-latest
@@ -245,17 +320,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
-      - name: Install dependencies
-        run: yarn install
+          cache: npm
+      - name: Install dependencies (npm)
+        run: |
+          rm -f ~/.npmrc || true
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
+          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
+          npm ci --omit=optional --no-audit --no-fund
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
       - name: create npm dirs
-        run: yarn napi create-npm-dirs
+        run: npx napi create-npm-dirs
       - name: Download all artifacts
         uses: actions/download-artifact@v5
         with:
           path: artifacts
       - name: Move artifacts
-        run: yarn artifacts
+        run: npm run artifacts
       - name: List packages
         run: ls -R ./npm
         shell: bash
