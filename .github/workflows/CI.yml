@@ -36,18 +36,18 @@ jobs:
           components: clippy, rustfmt
       - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc || true
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
-          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
-        env:
-          NODE_AUTH_TOKEN: ''
-          NPM_TOKEN: ''
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+        env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
         run: npm install --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
         run: npm ci --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Oxlint
         run: npm run lint
       - name: Cargo fmt
@@ -119,18 +119,18 @@ jobs:
         shell: bash
       - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc || true
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
-          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
-        env:
-          NODE_AUTH_TOKEN: ''
-          NPM_TOKEN: ''
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+        env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
         run: npm install --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
         run: npm ci --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Build
         run: ${{ matrix.settings.build }}
         shell: bash
@@ -176,18 +176,18 @@ jobs:
           architecture: ${{ matrix.settings.architecture }}
       - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc || true
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
-          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
-        env:
-          NODE_AUTH_TOKEN: ''
-          NPM_TOKEN: ''
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+        env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
         run: npm install --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
         run: npm ci --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -240,18 +240,18 @@ jobs:
           " >> $GITHUB_OUTPUT
       - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc || true
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
-          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
-        env:
-          NODE_AUTH_TOKEN: ''
-          NPM_TOKEN: ''
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+        env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
         run: npm install --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
         run: npm ci --omit=optional --no-audit --no-fund
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
