@@ -1,6 +1,6 @@
 {
   "name": "@zjonsson/arrsac",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Robust line fitting for Node.js powered by a Rust implementation of ARR-SAC.",
   "main": "index.js",
   "repository": "git@github.com:napi-rs/package-template.git",
@@ -35,7 +35,7 @@
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
-	"types": "index.d.ts",
+  "types": "index.d.ts",
   "scripts": {
     "artifacts": "napi artifacts",
     "bench": "node --import @oxc-node/core/register benchmark/bench.ts",
