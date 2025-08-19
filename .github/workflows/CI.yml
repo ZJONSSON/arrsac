@@ -34,15 +34,22 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
-      - name: Install dependencies (npm)
+      - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc
+          rm -f ~/.npmrc || true
           npm config set always-auth false
+          npm config set registry https://registry.npmjs.org/
+          npm config set @zjonsson:registry https://registry.npmjs.org/
           npm config delete //registry.npmjs.org/:_authToken || true
-          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --omit=optional --no-audit --no-fund
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm ci --omit=optional --no-audit --no-fund
       - name: Oxlint
         run: npm run lint
       - name: Cargo fmt
@@ -112,15 +119,22 @@ jobs:
         run: ${{ matrix.settings.setup }}
         if: ${{ matrix.settings.setup }}
         shell: bash
-      - name: Install dependencies (npm)
+      - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc
+          rm -f ~/.npmrc || true
           npm config set always-auth false
+          npm config set registry https://registry.npmjs.org/
+          npm config set @zjonsson:registry https://registry.npmjs.org/
           npm config delete //registry.npmjs.org/:_authToken || true
-          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --omit=optional --no-audit --no-fund
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm ci --omit=optional --no-audit --no-fund
       - name: Build
         run: ${{ matrix.settings.build }}
         shell: bash
@@ -164,15 +178,22 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
           architecture: ${{ matrix.settings.architecture }}
-      - name: Install dependencies (npm)
+      - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc
+          rm -f ~/.npmrc || true
           npm config set always-auth false
+          npm config set registry https://registry.npmjs.org/
+          npm config set @zjonsson:registry https://registry.npmjs.org/
           npm config delete //registry.npmjs.org/:_authToken || true
-          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --omit=optional --no-audit --no-fund
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm ci --omit=optional --no-audit --no-fund
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -223,15 +244,22 @@ jobs:
               console.log('IMAGE=node:${{ matrix.node }}-slim')
             }
           " >> $GITHUB_OUTPUT
-      - name: Install dependencies (npm)
+      - name: Configure npm (public registry, no auth)
         run: |
-          rm -f ~/.npmrc
+          rm -f ~/.npmrc || true
           npm config set always-auth false
+          npm config set registry https://registry.npmjs.org/
+          npm config set @zjonsson:registry https://registry.npmjs.org/
           npm config delete //registry.npmjs.org/:_authToken || true
-          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
+      - name: Install dependencies (PRs use npm install)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm install --omit=optional --no-audit --no-fund
+      - name: Install dependencies (push/branch uses npm ci)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm ci --omit=optional --no-audit --no-fund
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -272,10 +300,12 @@ jobs:
           cache: npm
       - name: Install dependencies (npm)
         run: |
-          rm -f ~/.npmrc
+          rm -f ~/.npmrc || true
           npm config set always-auth false
+          npm config set registry https://registry.npmjs.org/
+          npm config set @zjonsson:registry https://registry.npmjs.org/
           npm config delete //registry.npmjs.org/:_authToken || true
-          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+          npm ci --omit=optional --no-audit --no-fund
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
