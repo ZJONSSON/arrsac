@@ -36,18 +36,22 @@ jobs:
           components: clippy, rustfmt
       - name: Configure npm (public registry, no auth)
         run: |
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
         env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
-        run: npm install --omit=optional --no-audit --no-fund
+        run: npm install --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
-        run: npm ci --omit=optional --no-audit --no-fund
+        run: npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Oxlint
         run: npm run lint
       - name: Cargo fmt
@@ -119,18 +123,22 @@ jobs:
         shell: bash
       - name: Configure npm (public registry, no auth)
         run: |
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
         env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
-        run: npm install --omit=optional --no-audit --no-fund
+        run: npm install --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
-        run: npm ci --omit=optional --no-audit --no-fund
+        run: npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Build
         run: ${{ matrix.settings.build }}
         shell: bash
@@ -176,18 +184,22 @@ jobs:
           architecture: ${{ matrix.settings.architecture }}
       - name: Configure npm (public registry, no auth)
         run: |
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
         env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
-        run: npm install --omit=optional --no-audit --no-fund
+        run: npm install --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
-        run: npm ci --omit=optional --no-audit --no-fund
+        run: npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+          NPM_CONFIG_ALWAYS_AUTH: false
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -240,7 +252,7 @@ jobs:
           " >> $GITHUB_OUTPUT
       - name: Configure npm (public registry, no auth)
         run: |
-          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\n" > .npmrc
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > .npmrc
         env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
