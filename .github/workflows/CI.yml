@@ -37,7 +37,12 @@ jobs:
       - name: Install dependencies (npm)
         run: |
           rm -f ~/.npmrc
+          npm config set always-auth false
+          npm config delete //registry.npmjs.org/:_authToken || true
           npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
       - name: Oxlint
         run: npm run lint
       - name: Cargo fmt
@@ -110,7 +115,12 @@ jobs:
       - name: Install dependencies (npm)
         run: |
           rm -f ~/.npmrc
+          npm config set always-auth false
+          npm config delete //registry.npmjs.org/:_authToken || true
           npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
       - name: Build
         run: ${{ matrix.settings.build }}
         shell: bash
@@ -157,7 +167,12 @@ jobs:
       - name: Install dependencies (npm)
         run: |
           rm -f ~/.npmrc
+          npm config set always-auth false
+          npm config delete //registry.npmjs.org/:_authToken || true
           npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -211,7 +226,12 @@ jobs:
       - name: Install dependencies (npm)
         run: |
           rm -f ~/.npmrc
+          npm config set always-auth false
+          npm config delete //registry.npmjs.org/:_authToken || true
           npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -253,7 +273,12 @@ jobs:
       - name: Install dependencies (npm)
         run: |
           rm -f ~/.npmrc
+          npm config set always-auth false
+          npm config delete //registry.npmjs.org/:_authToken || true
           npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
       - name: create npm dirs
         run: npx napi create-npm-dirs
       - name: Download all artifacts
