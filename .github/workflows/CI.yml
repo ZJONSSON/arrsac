@@ -35,7 +35,9 @@ jobs:
         with:
           components: clippy, rustfmt
       - name: Install dependencies (npm)
-        run: npm ci --no-audit --no-fund --no-optional
+        run: |
+          rm -f ~/.npmrc
+          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
       - name: Oxlint
         run: npm run lint
       - name: Cargo fmt
@@ -106,7 +108,9 @@ jobs:
         if: ${{ matrix.settings.setup }}
         shell: bash
       - name: Install dependencies (npm)
-        run: npm ci --no-audit --no-fund --no-optional
+        run: |
+          rm -f ~/.npmrc
+          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
       - name: Build
         run: ${{ matrix.settings.build }}
         shell: bash
@@ -151,7 +155,9 @@ jobs:
           cache: npm
           architecture: ${{ matrix.settings.architecture }}
       - name: Install dependencies (npm)
-        run: npm ci --no-audit --no-fund --no-optional
+        run: |
+          rm -f ~/.npmrc
+          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -204,7 +210,8 @@ jobs:
           " >> $GITHUB_OUTPUT
       - name: Install dependencies (npm)
         run: |
-          npm ci --no-audit --no-fund --no-optional
+          rm -f ~/.npmrc
+          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -244,7 +251,9 @@ jobs:
           node-version: 22
           cache: npm
       - name: Install dependencies (npm)
-        run: npm ci --no-audit --no-fund --no-optional
+        run: |
+          rm -f ~/.npmrc
+          npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
       - name: create npm dirs
         run: npx napi create-npm-dirs
       - name: Download all artifacts
