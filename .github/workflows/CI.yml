@@ -37,10 +37,8 @@ jobs:
       - name: Configure npm (public registry, no auth)
         run: |
           rm -f ~/.npmrc || true
-          npm config set always-auth false
-          npm config set registry https://registry.npmjs.org/
-          npm config set @zjonsson:registry https://registry.npmjs.org/
-          npm config delete //registry.npmjs.org/:_authToken || true
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
+          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
@@ -122,10 +120,8 @@ jobs:
       - name: Configure npm (public registry, no auth)
         run: |
           rm -f ~/.npmrc || true
-          npm config set always-auth false
-          npm config set registry https://registry.npmjs.org/
-          npm config set @zjonsson:registry https://registry.npmjs.org/
-          npm config delete //registry.npmjs.org/:_authToken || true
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
+          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
@@ -181,10 +177,8 @@ jobs:
       - name: Configure npm (public registry, no auth)
         run: |
           rm -f ~/.npmrc || true
-          npm config set always-auth false
-          npm config set registry https://registry.npmjs.org/
-          npm config set @zjonsson:registry https://registry.npmjs.org/
-          npm config delete //registry.npmjs.org/:_authToken || true
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
+          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
@@ -247,10 +241,8 @@ jobs:
       - name: Configure npm (public registry, no auth)
         run: |
           rm -f ~/.npmrc || true
-          npm config set always-auth false
-          npm config set registry https://registry.npmjs.org/
-          npm config set @zjonsson:registry https://registry.npmjs.org/
-          npm config delete //registry.npmjs.org/:_authToken || true
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
+          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
         env:
           NODE_AUTH_TOKEN: ''
           NPM_TOKEN: ''
@@ -301,10 +293,8 @@ jobs:
       - name: Install dependencies (npm)
         run: |
           rm -f ~/.npmrc || true
-          npm config set always-auth false
-          npm config set registry https://registry.npmjs.org/
-          npm config set @zjonsson:registry https://registry.npmjs.org/
-          npm config delete //registry.npmjs.org/:_authToken || true
+          printf "registry=https://registry.npmjs.org/\n@zjonsson:registry=https://registry.npmjs.org/\nalways-auth=false\n" > ~/.npmrc
+          sed -i '=/registry.npmjs.org/:_authToken=d' ~/.npmrc || true
           npm ci --omit=optional --no-audit --no-fund
         env:
           NODE_AUTH_TOKEN: ''

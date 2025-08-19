@@ -102,11 +102,11 @@
   },
   "packageManager": "yarn@4.9.2",
   "optionalDependencies": {
-    "arrsac-win32-x64-msvc": "1.0.0",
-    "arrsac-darwin-x64": "1.0.0",
-    "arrsac-linux-x64-gnu": "1.0.0",
-    "arrsac-linux-arm64-gnu": "1.0.0",
-    "arrsac-darwin-arm64": "1.0.0",
-    "arrsac-win32-arm64-msvc": "1.0.0"
+    "@zjonsson/arrsac-win32-x64-msvc": "0.0.2",
+    "@zjonsson/arrsac-darwin-x64": "0.0.2",
+    "@zjonsson/arrsac-linux-x64-gnu": "0.0.2",
+    "@zjonsson/arrsac-linux-arm64-gnu": "0.0.2",
+    "@zjonsson/arrsac-darwin-arm64": "0.0.2",
+    "@zjonsson/arrsac-win32-arm64-msvc": "0.0.2"
   }
 }
