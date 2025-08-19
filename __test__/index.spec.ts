@@ -1,9 +1,6 @@
-import test from 'ava'
-import { createRequire } from 'node:module'
+const test = require('ava')
 
-const require = createRequire(import.meta.url)
-
-let arrsacLine: ((x: number[], y: number[], options?: any) => any) | null = null
+let arrsacLine = null as null | ((x: number[], y: number[], options?: any) => any)
 let loadError: unknown = null
 
 try {
@@ -13,7 +10,7 @@ try {
   loadError = e
 }
 
-test('loads native binding (skips if unavailable)', (t) => {
+test('loads native binding (skips if unavailable)', (t: any) => {
   if (loadError || !arrsacLine) {
     t.log('Native binding not available in this environment, skipping further tests')
     t.pass()
@@ -22,7 +19,7 @@ test('loads native binding (skips if unavailable)', (t) => {
   t.is(typeof arrsacLine, 'function')
 })
 
-test('returns null on mismatched input lengths', (t) => {
+test('returns null on mismatched input lengths', (t: any) => {
   if (!arrsacLine) {
     t.pass()
     return
@@ -31,7 +28,7 @@ test('returns null on mismatched input lengths', (t) => {
   t.is(result, null)
 })
 
-test('fits a line and rejects a clear outlier', (t) => {
+test('fits a line and rejects a clear outlier', (t: any) => {
   if (!arrsacLine) {
     t.pass()
     return

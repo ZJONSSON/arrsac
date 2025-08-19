@@ -41,17 +41,19 @@
     "bench": "node --import @oxc-node/core/register benchmark/bench.ts",
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
+    "build:test": "tsc -p __test__/tsconfig.json",
     "format": "run-p format:prettier format:rs format:toml",
     "format:prettier": "prettier . -w",
     "format:toml": "taplo format",
     "format:rs": "cargo fmt",
     "lint": "oxlint .",
     "prepublishOnly": "napi prepublish -t npm",
-    "test": "ava",
+    "test": "npm run build:test && ava __test__/lib/**/*.js",
     "version": "napi version",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@types/node": "^22.7.9",
     "@emnapi/core": "^1.4.5",
     "@emnapi/runtime": "^1.4.5",
     "@napi-rs/cli": "^3.0.3",
@@ -59,6 +61,7 @@
     "@taplo/cli": "^0.7.0",
     "@tybys/wasm-util": "^0.10.0",
     "ava": "^6.4.1",
+    "ts-node": "^10.9.2",
     "chalk": "^5.4.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
@@ -80,17 +83,10 @@
     ]
   },
   "ava": {
-    "extensions": {
-      "ts": "module"
-    },
     "timeout": "2m",
     "workerThreads": false,
-    "environmentVariables": {
-      "OXC_TSCONFIG_PATH": "./__test__/tsconfig.json"
-    },
-    "nodeArguments": [
-      "--import",
-      "@oxc-node/core/register"
+    "files": [
+      "__test__/lib/**/*.js"
     ]
   },
   "prettier": {

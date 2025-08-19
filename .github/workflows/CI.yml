@@ -30,6 +30,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Workaround npm optional deps bug (remove lockfile on Linux)
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        run: rm -f package-lock.json || true
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -40,14 +43,14 @@ jobs:
         env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
-        run: npm install --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
           NPM_CONFIG_ALWAYS_AUTH: false
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
-        run: npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
@@ -90,11 +93,24 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Workaround npm optional deps bug (remove lockfile on Linux)
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        run: rm -f package-lock.json || true
       - name: Install
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
           targets: ${{ matrix.settings.target }}
+      - name: Install aarch64 GNU cross-compiler (Ubuntu)
+        if: ${{ matrix.settings.host == 'ubuntu-latest' && contains(matrix.settings.target, 'aarch64-unknown-linux-gnu') }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+      - name: Configure cargo linker for aarch64-unknown-linux-gnu
+        if: ${{ matrix.settings.host == 'ubuntu-latest' && contains(matrix.settings.target, 'aarch64-unknown-linux-gnu') }}
+        run: |
+          mkdir -p .cargo
+          printf "[target.aarch64-unknown-linux-gnu]\nlinker = \"aarch64-linux-gnu-gcc\"\n" > .cargo/config.toml
       - name: Cache cargo
         uses: actions/cache@v4
         with:
@@ -127,14 +143,14 @@ jobs:
         env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
-        run: npm install --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
           NPM_CONFIG_ALWAYS_AUTH: false
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
-        run: npm ci --omit=optional --no-audit --no-fund --registry=https://registry.npmjs.org/
+        run: npm install --no-audit --no-fund --registry=https://registry.npmjs.org/
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
@@ -231,6 +247,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
+      - name: Workaround npm optional deps bug (remove lockfile on Linux)
+        if: ${{ startsWith(runner.os, 'Linux') }}
+        run: rm -f package-lock.json || true
       - name: Output docker params
         id: docker
         run: |
@@ -256,12 +275,12 @@ jobs:
         env: {}
       - name: Install dependencies (PRs use npm install)
         if: ${{ github.event_name == 'pull_request' }}
-        run: npm install --omit=optional --no-audit --no-fund
+        run: npm install --no-audit --no-fund
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Install dependencies (push/branch uses npm ci)
         if: ${{ github.event_name != 'pull_request' }}
-        run: npm ci --omit=optional --no-audit --no-fund
+        run: npm install --no-audit --no-fund
         env:
           NPM_CONFIG_USERCONFIG: ${{ github.workspace }}/.npmrc
       - name: Download artifacts
